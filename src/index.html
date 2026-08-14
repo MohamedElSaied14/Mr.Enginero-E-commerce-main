@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mr.Enginero Store</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PC hardware and gaming gear in Egypt — graphics cards, processors, laptops, monitors and peripherals with the original price shown on every product.">
+  <meta name="theme-color" content="#0B62B5">
+
+  <!--
+    Tab icon, all cut from the supplied logo.png by `npm run icons`. No SVG is
+    offered here on purpose: browsers prefer an SVG icon when one is declared,
+    which would show the vector stand-in instead of the real artwork.
+  -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/x-icon" sizes="64x64" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+  <!-- Link preview when the store is shared on Facebook or WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Mr.Enginero">
+  <meta property="og:title" content="Mr.Enginero — PC hardware & gaming gear in Egypt">
+  <meta property="og:description" content="Graphics cards, processors, laptops, monitors and peripherals — the original price shown on every product. Cash on delivery across Egypt.">
+  <meta property="og:image" content="logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Warm up the two third-party origins the first paint depends on. -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Product photography is served from Shopify's CDN. -->
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.shopify.com">
+
+  <!-- Bootstrap's grid/table/form primitives; our tokens re-skin them. -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!--
+    Set the theme before the app boots so a dark-mode visitor never sees a
+    white flash while the bundle downloads.
+  -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('shopzone.theme');
+        var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (dark) document.body && document.body.classList.add('dark-theme');
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    /* Paint the page background before styles.css arrives. */
+    html { background: #f6f5f7; }
+    html[data-theme='dark'] { background: #0d0d14; }
+  </style>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

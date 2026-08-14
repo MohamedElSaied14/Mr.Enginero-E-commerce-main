@@ -1,0 +1,286 @@
+:host { display: block; }
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.site-header.is-scrolled {
+  border-bottom-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-bar {
+  max-width: 1440px;
+  margin-inline: auto;
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-inline: 1rem;
+}
+@media (max-width: 480px) {
+  .header-bar { gap: 0.5rem; padding-inline: 0.6rem; }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  /* Lets the wordmark truncate instead of pushing the icons off-screen. */
+  min-width: 0;
+  overflow: hidden;
+  min-height: 44px;
+}
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  /* The artwork is not square — contain it rather than stretch it. */
+  object-fit: contain;
+}
+.brand-word {
+  font-family: var(--font-display);
+  /* Scales with the viewport so it never crowds the action icons. */
+  font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-dot { color: var(--brand-500); }
+
+.icon-whatsapp { color: #25D366; }
+.icon-whatsapp:hover { color: #1da851; }
+
+/* ===== Nav ================================================================ */
+
+.nav-desktop { display: flex; gap: 0.25rem; margin-inline-start: 1.5rem; flex: 1; }
+
+.nav-link {
+  position: relative;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+.nav-link:hover { color: var(--text); }
+.nav-link.is-active { color: var(--brand-500); font-weight: 500; }
+.nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-end: 0.15rem;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-500);
+}
+.nav-deals::before { content: '🔥'; margin-inline-end: 0.3rem; font-size: 0.8em; }
+.nav-admin { color: var(--accent); }
+
+/* ===== Actions ============================================================ */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-inline-start: auto;
+  /* Never let the icon row be the thing that widens the page. */
+  flex: 0 0 auto;
+}
+
+.icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* 42px keeps every icon a comfortable thumb target. */
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--fast) var(--ease);
+}
+.icon-btn:hover { background: var(--surface-sunken); color: var(--text); }
+
+.badge-dot {
+  position: absolute;
+  inset-block-start: 1px;
+  inset-inline-end: 1px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 0.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--brand-500);
+  color: #fff;
+  font-size: 0.63rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.badge-cart { background: var(--accent); }
+
+.user-chip {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding-inline: 0.4rem;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-login { padding-inline: 0.6rem; }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 42px;
+  height: 42px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: transform var(--fast) var(--ease), opacity var(--fast) var(--ease);
+}
+.hamburger.is-open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ===== Search ============================================================= */
+
+.search-panel {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0.85rem 1rem;
+}
+.search-row {
+  max-width: 720px;
+  margin-inline: auto;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.search-status {
+  max-width: 720px;
+  margin: 0.75rem auto 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.search-results {
+  max-width: 720px;
+  margin: 0.6rem auto 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+}
+.search-result {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+  color: var(--text);
+}
+.search-result:hover { background: var(--surface-sunken); }
+.search-result img {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+}
+.result-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.result-name {
+  font-size: 0.86rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.result-meta { font-size: 0.74rem; color: var(--text-muted); }
+.result-price { font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
+
+.search-all {
+  width: 100%;
+  padding: 0.55rem;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  color: var(--brand-500);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.search-all:hover { background: var(--surface-sunken); }
+
+/* ===== Mobile menu ======================================================== */
+
+.nav-mobile {
+  display: none;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.nav-mobile.is-open { display: flex; }
+
+.mobile-link {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+.mobile-link:hover { background: var(--surface-sunken); color: var(--brand-500); }
+.mobile-btn { border: 0; border-bottom: 1px solid var(--border); background: none; text-align: start; cursor: pointer; }
+
+@media (max-width: 991px) {
+  .nav-desktop { display: none; }
+  .hamburger { display: flex; }
+  .user-chip { display: none; }
+}
+
+/*
+  Below 560px seven icons no longer fit beside the wordmark — that was pushing
+  the page 39px wider than the viewport. Theme, WhatsApp and wishlist move into
+  the mobile menu; search, cart and the menu button stay on the bar.
+*/
+@media (max-width: 560px) {
+  .nav-login,
+  .icon-theme,
+  .icon-whatsapp,
+  .icon-wishlist { display: none; }
+  .brand-mark { width: 32px; height: 32px; flex-basis: 32px; }
+}

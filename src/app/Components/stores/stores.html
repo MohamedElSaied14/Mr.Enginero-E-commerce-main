@@ -1,0 +1,109 @@
+<div class="page stores">
+  <header class="stores-head">
+    <p class="section-eyebrow">Where our prices come from</p>
+    <h1 class="section-title">Hardware shops we source from</h1>
+    <div class="section-divider"></div>
+    <p class="stores-sub">
+      Every product carries the shop it came from. Most of them are Alexandria businesses — you can
+      filter the catalogue by any one of them.
+    </p>
+  </header>
+
+  <div class="stores-toolbar surface-card">
+    <input
+      type="search"
+      class="form-control"
+      placeholder="Search by name, area or speciality…"
+      aria-label="Search companies"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+    />
+    <div class="chip-row">
+      <button type="button" class="chip" [class.is-active]="cityFilter() === null" (click)="cityFilter.set(null)">
+        All cities
+      </button>
+      @for (city of cities(); track city) {
+        <button
+          type="button"
+          class="chip"
+          [class.is-active]="cityFilter() === city"
+          (click)="cityFilter.set(cityFilter() === city ? null : city)"
+        >
+          {{ city }}<span class="chip-count">{{ countIn(city) }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="store-grid">
+      @for (s of [1,2,3,4]; track s) {
+        <div class="surface-card store-card"><span class="skeleton" style="height:150px;display:block"></span></div>
+      }
+    </div>
+  } @else if (!companies().length) {
+    <div class="empty-state">
+      <div class="empty-state-icon">🏬</div>
+      <h2 class="h5 mt-3">No company matches that</h2>
+    </div>
+  } @else {
+    <div class="store-grid">
+      @for (company of companies(); track company.id) {
+        <article class="surface-card store-card">
+          <header class="store-card-head">
+            <div>
+              <h2 class="store-name">{{ company.name }}</h2>
+              <p class="store-where">📍 {{ company.area }}{{ company.area !== '—' ? ', ' : '' }}{{ company.city }}</p>
+            </div>
+            @if (company.catalogueStatus === 'connected') {
+              <span class="store-badge is-live">{{ company.products }} products</span>
+            } @else {
+              <span class="store-badge is-pending">Not connected</span>
+            }
+          </header>
+
+          @if (company.address) {
+            <p class="store-address">{{ company.address }}</p>
+          }
+
+          @if (company.specialities?.length) {
+            <ul class="store-tags">
+              @for (s of company.specialities; track s) {
+                <li>{{ s }}</li>
+              }
+            </ul>
+          }
+
+          @if (company.catalogueStatus === 'connected') {
+            <dl class="store-stats">
+              <div><dt>In stock</dt><dd>{{ company.inStock }}</dd></div>
+              <div><dt>On sale</dt><dd>{{ company.onSale }}</dd></div>
+              <div><dt>From</dt><dd>{{ company.cheapest | calc }}</dd></div>
+            </dl>
+          } @else if (company.catalogueNote) {
+            <p class="store-note">{{ company.catalogueNote }}</p>
+          }
+
+          <div class="store-actions">
+            @if (company.catalogueStatus === 'connected') {
+              <a class="btn btn-brand btn-sm" [routerLink]="['/shop']" [queryParams]="{ supplier: company.id }">
+                Browse their stock
+              </a>
+            }
+            <a class="btn btn-ghost btn-sm" [href]="company.site" target="_blank" rel="noopener">Their site ↗</a>
+            <a class="btn btn-ghost btn-sm" [href]="mapsHref(company)" target="_blank" rel="noopener">Map</a>
+            @if (company.phone) {
+              <a class="btn btn-ghost btn-sm" [href]="'tel:' + company.phone">Call</a>
+            }
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (capturedOn()) {
+      <p class="stores-footnote">
+        Prices were captured from these shops on {{ capturedOn() }}. Re-run the catalogue build to refresh them.
+      </p>
+    }
+  }
+</div>

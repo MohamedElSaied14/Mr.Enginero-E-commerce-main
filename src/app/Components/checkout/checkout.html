@@ -1,0 +1,190 @@
+<div class="page checkout">
+  <header class="checkout-head">
+    <p class="section-eyebrow">Step 2 of 2</p>
+    <h1 class="section-title">Checkout</h1>
+  </header>
+
+  @if (cart.isEmpty()) {
+    <div class="empty-state">
+      <div class="empty-state-icon">🛒</div>
+      <h2 class="h5 mt-3">There is nothing to check out</h2>
+      <button type="button" class="btn btn-brand mt-2" (click)="backToCart()">Back to cart</button>
+    </div>
+  } @else {
+    <div class="checkout-layout">
+      <section class="checkout-form surface-card">
+        @if (serverError()) {
+          <div class="alert alert-danger" role="alert">{{ serverError() }}</div>
+        }
+
+        <h2 class="block-title">Who is receiving the order?</h2>
+        <div class="field-grid">
+          <label class="field field-wide">
+            <span class="field-label">Full name *</span>
+            <input
+              class="form-control"
+              autocomplete="name"
+              [value]="form().name"
+              (input)="patch('name', $any($event.target).value)"
+              [class.is-invalid]="showErrors() && errors().name"
+            />
+            @if (showErrors() && errors().name) { <span class="field-error">{{ errors().name }}</span> }
+          </label>
+
+          <label class="field">
+            <span class="field-label">Mobile number *</span>
+            <input
+              class="form-control"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel"
+              placeholder="01012345678"
+              [value]="form().phone"
+              (input)="patch('phone', $any($event.target).value)"
+              [class.is-invalid]="showErrors() && errors().phone"
+            />
+            @if (showErrors() && errors().phone) {
+              <span class="field-error">{{ errors().phone }}</span>
+            } @else {
+              <span class="field-hint">We call this number to confirm delivery.</span>
+            }
+          </label>
+
+          <label class="field">
+            <span class="field-label">Email (optional)</span>
+            <input
+              class="form-control"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              [value]="form().email"
+              (input)="patch('email', $any($event.target).value)"
+              [class.is-invalid]="showErrors() && errors().email"
+            />
+            @if (showErrors() && errors().email) {
+              <span class="field-error">{{ errors().email }}</span>
+            } @else {
+              <span class="field-hint">Leave it and we email your receipt.</span>
+            }
+          </label>
+        </div>
+
+        <h2 class="block-title">Where do we deliver?</h2>
+        <div class="field-grid">
+          <label class="field">
+            <span class="field-label">Governorate *</span>
+            <select
+              class="form-select"
+              [value]="form().governorate"
+              (change)="patch('governorate', $any($event.target).value)"
+              [class.is-invalid]="showErrors() && errors().governorate"
+            >
+              <option value="">Choose…</option>
+              @for (governorate of config()?.governorates ?? []; track governorate) {
+                <option [value]="governorate">{{ governorate }}</option>
+              }
+            </select>
+            @if (showErrors() && errors().governorate) { <span class="field-error">{{ errors().governorate }}</span> }
+          </label>
+
+          <label class="field">
+            <span class="field-label">City / district *</span>
+            <input
+              class="form-control"
+              autocomplete="address-level2"
+              placeholder="Nasr City"
+              [value]="form().city"
+              (input)="patch('city', $any($event.target).value)"
+              [class.is-invalid]="showErrors() && errors().city"
+            />
+            @if (showErrors() && errors().city) { <span class="field-error">{{ errors().city }}</span> }
+          </label>
+
+          <label class="field field-wide">
+            <span class="field-label">Street address *</span>
+            <input
+              class="form-control"
+              autocomplete="street-address"
+              placeholder="12 Abbas El Akkad Street, building 7, flat 5"
+              [value]="form().street"
+              (input)="patch('street', $any($event.target).value)"
+              [class.is-invalid]="showErrors() && errors().street"
+            />
+            @if (showErrors() && errors().street) { <span class="field-error">{{ errors().street }}</span> }
+          </label>
+
+          <label class="field field-wide">
+            <span class="field-label">Delivery notes (optional)</span>
+            <textarea
+              class="form-control"
+              rows="2"
+              placeholder="Landmark, best time to call, gate code…"
+              [value]="form().notes"
+              (input)="patch('notes', $any($event.target).value)"
+            ></textarea>
+          </label>
+        </div>
+
+        <h2 class="block-title">Payment</h2>
+        <div class="payment-option is-selected">
+          <span class="payment-radio" aria-hidden="true">●</span>
+          <div>
+            <span class="payment-label">Cash on delivery</span>
+            <span class="payment-desc">
+              Pay the courier in cash when your order arrives. Nothing is charged now, and there are no
+              card details to enter.
+            </span>
+          </div>
+          <strong class="payment-amount">{{ total() | calc }}</strong>
+        </div>
+      </section>
+
+      <aside class="checkout-summary surface-card">
+        <h2 class="block-title">Your order</h2>
+
+        <ul class="summary-items">
+          @for (line of cart.lines(); track line.id) {
+            <li>
+              <img [src]="line.imgUrl" [alt]="" loading="lazy" decoding="async" width="48" height="48" />
+              <span class="summary-item-copy">
+                <span class="summary-item-name">{{ line.name }}</span>
+                <span class="summary-item-qty">{{ line.quantity }} × {{ line.price | calc }}</span>
+              </span>
+              <span class="summary-item-total">{{ line.price * line.quantity | calc }}</span>
+            </li>
+          }
+        </ul>
+
+        <dl class="summary-rows">
+          <div><dt>Subtotal</dt><dd>{{ cart.subtotal() | calc }}</dd></div>
+          @if (cart.savings() > 0) {
+            <div class="is-saving"><dt>Discounts</dt><dd>− {{ cart.savings() | calc }}</dd></div>
+          }
+          <div><dt>Delivery</dt><dd>{{ shipping() === 0 ? 'Free' : (shipping() | calc) }}</dd></div>
+          @if (codFee() > 0) {
+            <div><dt>Cash-on-delivery fee</dt><dd>{{ codFee() | calc }}</dd></div>
+          }
+        </dl>
+
+        @if (shipping() > 0 && freeShippingGap() > 0) {
+          <p class="summary-hint">Add {{ freeShippingGap() | calc }} more for free delivery.</p>
+        }
+
+        <div class="summary-total">
+          <span>Pay on delivery</span>
+          <strong>{{ total() | calc }}</strong>
+        </div>
+
+        <button type="button" class="btn btn-brand btn-lg w-100" [disabled]="placing()" (click)="place()">
+          {{ placing() ? 'Placing your order…' : 'Place order · ' + (total() | calc) }}
+        </button>
+        <button type="button" class="btn btn-ghost w-100" (click)="backToCart()">Back to cart</button>
+
+        <p class="summary-note">
+          By placing the order you agree to pay {{ total() | calc }} in cash on delivery. We will call you
+          to confirm before dispatch.
+        </p>
+      </aside>
+    </div>
+  }
+</div>

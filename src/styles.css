@@ -1,0 +1,515 @@
+/* ============================================================================
+   ShopZone design system
+   Every colour, radius, shadow and motion value in the app resolves to a token
+   defined here. Dark mode is a token swap on :root[data-theme="dark"] — not a
+   pile of `!important` overrides.
+   ========================================================================== */
+
+:root {
+  /* Brand */
+  --brand-50:  #fbf1f3;
+  --brand-100: #f5dde2;
+  --brand-300: #d99aa8;
+  --brand-500: #a0394a;
+  --brand-600: #8a2f3f;
+  --brand-700: #6d2432;
+  --accent:    #d98324;
+  --accent-soft: #fdf3e6;
+
+  /* Feedback */
+  --success: #1f9254;
+  --success-soft: #e6f4ec;
+  --danger:  #d13c3c;
+  --danger-soft: #fbeaea;
+  --warning: #c9860a;
+
+  /* Neutrals — light theme */
+  --bg:            #f6f5f7;
+  --surface:       #ffffff;
+  --surface-sunken:#f1eff2;
+  --surface-raised:#ffffff;
+  --border:        #e4e0e6;
+  --border-strong: #cfc8d3;
+  --text:          #1c1a20;
+  --text-muted:    #6b6674;
+  --text-subtle:   #8f8a98;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(24, 20, 30, 0.06);
+  --shadow-md: 0 4px 14px rgba(24, 20, 30, 0.08);
+  --shadow-lg: 0 18px 44px rgba(24, 20, 30, 0.14);
+  --ring: 0 0 0 3px rgba(160, 57, 74, 0.28);
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --fast: 140ms;
+  --base: 240ms;
+
+  /* Type */
+  --font-body: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+
+  --header-h: 68px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --brand-50:  #2a161c;
+  --brand-100: #3a1d26;
+  --brand-300: #b8697a;
+  --brand-500: #d1697c;
+  --brand-600: #c25668;
+  --brand-700: #a94657;
+  --accent:    #e9a63f;
+  --accent-soft: #33260f;
+
+  --success: #4ecb87;
+  --success-soft: #17301f;
+  --danger:  #f0736f;
+  --danger-soft: #341a1a;
+  --warning: #e5ab3c;
+
+  --bg:            #0d0d14;
+  --surface:       #16161f;
+  --surface-sunken:#111119;
+  --surface-raised:#1e1e2a;
+  --border:        #2a2a38;
+  --border-strong: #3b3b4d;
+  --text:          #e9e8ee;
+  --text-muted:    #a3a0af;
+  --text-subtle:   #7c798a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.6);
+  --ring: 0 0 0 3px rgba(209, 105, 124, 0.35);
+
+  color-scheme: dark;
+}
+
+/* ===== Base ============================================================== */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+  Blink leaves a transitioned background-color stuck at its old value when the
+  value comes from a custom property that has just changed — which is exactly
+  what a theme switch does. Transitions are suppressed for the frame in which
+  the theme flips; ThemeService adds and removes this class. A theme switch
+  should be instant anyway, so nothing is lost.
+*/
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition: none !important;
+}
+
+/*
+  A long unbroken product title or URL must wrap rather than widen the page.
+  Paired with the per-component fixes this is what keeps mobile free of
+  sideways scrolling.
+*/
+body,
+p, h1, h2, h3, h4, h5, h6, li, dd, dt, td, th, a, span {
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 { color: var(--text); }
+
+a { color: var(--brand-500); }
+a:hover { color: var(--brand-600); }
+
+/* Every focusable element gets the same visible ring. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+img { max-width: 100%; }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 1100;
+  padding: 0.6rem 1rem;
+  background: var(--brand-500);
+  color: #fff;
+  border-radius: 0 0 var(--radius-md) 0;
+}
+.skip-link:focus { left: 0; top: 0; color: #fff; }
+
+main:focus { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== Bootstrap bridge =================================================
+   Bootstrap ships hard-coded light colours. Rather than fighting it per
+   component, its surface primitives are re-pointed at our tokens once.
+   ======================================================================= */
+
+.card,
+.modal-content,
+.list-group-item,
+.dropdown-menu {
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.table { --bs-table-color: var(--text); --bs-table-bg: transparent; color: var(--text); }
+.table > :not(caption) > * > * { background-color: transparent; border-color: var(--border); }
+.table-hover > tbody > tr:hover > * { background-color: var(--surface-sunken); color: var(--text); }
+.table thead th {
+  background: var(--surface-sunken);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-control,
+.form-select {
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.form-control::placeholder { color: var(--text-subtle); }
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--brand-500);
+  box-shadow: var(--ring);
+}
+.form-label { color: var(--text); font-weight: 500; }
+.form-check-input:checked { background-color: var(--brand-500); border-color: var(--brand-500); }
+
+.text-muted { color: var(--text-muted) !important; }
+hr { border-color: var(--border); opacity: 1; }
+
+.alert-success { background: var(--success-soft); color: var(--success); border-color: transparent; }
+.alert-danger  { background: var(--danger-soft);  color: var(--danger);  border-color: transparent; }
+
+/* ===== Buttons =========================================================== */
+
+.btn {
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  min-height: 40px;
+  transition: background-color var(--fast) var(--ease), border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease), box-shadow var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.btn-sm { min-height: 34px; }
+
+/* Form controls at 16px stop iOS Safari zooming the page on focus. */
+.form-control,
+.form-select {
+  min-height: 44px;
+  font-size: 16px;
+}
+@media (min-width: 768px) {
+  .form-control,
+  .form-select { font-size: 0.95rem; }
+  .form-control-sm,
+  .form-select-sm { min-height: 34px; }
+}
+
+.btn-brand {
+  background: var(--brand-500);
+  border: 1px solid var(--brand-500);
+  color: #fff;
+}
+.btn-brand:hover { background: var(--brand-600); border-color: var(--brand-600); color: #fff; }
+.btn-brand:disabled { opacity: 0.5; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+.btn-ghost:hover { border-color: var(--brand-500); color: var(--brand-500); }
+
+.btn-dark {
+  background: var(--brand-500);
+  border-color: var(--brand-500);
+}
+.btn-dark:hover { background: var(--brand-600); border-color: var(--brand-600); }
+
+/* ===== Layout helpers ==================================================== */
+
+.page { max-width: 1320px; margin-inline: auto; padding: 1.5rem 1rem 4rem; }
+
+.section-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brand-500);
+  margin: 0;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.5vw, 2.5rem);
+  font-weight: 500;
+  margin: 0.15rem 0 0;
+}
+.section-divider {
+  width: 56px;
+  height: 2px;
+  background: var(--brand-500);
+  border-radius: var(--radius-pill);
+  margin: 0.85rem auto 0;
+}
+
+.surface-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ===== Product card ====================================================== */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.pcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: transform var(--base) var(--ease), box-shadow var(--base) var(--ease),
+    border-color var(--base) var(--ease);
+  /* Hint the compositor so the hover lift never triggers a layout pass. */
+  will-change: transform;
+}
+.pcard:hover,
+.pcard:focus-within {
+  transform: translateY(-4px);
+  border-color: var(--brand-300);
+  box-shadow: var(--shadow-lg);
+}
+.pcard.is-sold-out { opacity: 0.72; }
+
+.pcard-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+/*
+  The link around the photo is inline by default, so it collapsed to one line of
+  text height and most of the image was not tappable. Fill the frame.
+*/
+.pcard-media > a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.pcard-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.75rem;
+  transition: transform var(--base) var(--ease);
+}
+.pcard:hover .pcard-img { transform: scale(1.05); }
+.pcard.is-sold-out .pcard-img { filter: grayscale(75%); }
+
+.pcard-badges {
+  position: absolute;
+  inset-block-start: 0.6rem;
+  inset-inline-start: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  z-index: 2;
+}
+.pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-pill);
+  line-height: 1.5;
+}
+.pill-sale { background: var(--danger); color: #fff; }
+.pill-new  { background: var(--brand-500); color: #fff; }
+.pill-last { background: var(--warning); color: #fff; }
+.pill-sold { background: var(--text-muted); color: #fff; }
+
+.pcard-wish {
+  position: absolute;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color var(--fast) var(--ease), border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease), box-shadow var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.pcard-wish:hover { transform: scale(1.1); border-color: var(--brand-500); color: var(--brand-500); }
+.pcard-wish.is-on { background: var(--brand-50); border-color: var(--brand-500); }
+
+.pcard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 0.95rem 1rem;
+  flex: 1;
+}
+.pcard-brand {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+.pcard-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  /* Two lines keeps every card in a row the same height. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pcard-name a { color: inherit; text-decoration: none; }
+.pcard-name a:hover { color: var(--brand-500); }
+
+.pcard-supplier {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  /* One line: shop names plus a city get long. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pcard-supplier:hover { color: var(--brand-500); }
+.supplier-pin { font-size: 0.68em; }
+
+.pcard-rating { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--text-muted); }
+.stars { color: var(--accent); letter-spacing: 0.05em; }
+
+.pcard-prices { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; margin-top: auto; }
+.price-now { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.price-was { font-size: 0.82rem; color: var(--text-subtle); text-decoration: line-through; }
+.price-off { font-size: 0.72rem; font-weight: 700; color: var(--success); }
+
+.pcard-stock { font-size: 0.75rem; color: var(--text-muted); }
+.pcard-stock.is-low { color: var(--warning); font-weight: 600; }
+.pcard-stock.is-out { color: var(--danger); }
+
+.pcard-actions { display: flex; gap: 0.5rem; margin-top: 0.55rem; }
+.pcard-actions .btn { flex: 1; font-size: 0.8rem; padding: 0.5rem 0.6rem; }
+
+/* ===== Skeletons ========================================================= */
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-sunken) 25%, var(--border) 37%, var(--surface-sunken) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+/* ===== Utilities ========================================================= */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  /* Comfortable to tap without being chunky on desktop. */
+  min-height: 40px;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--fast) var(--ease), border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease), box-shadow var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.chip:hover { border-color: var(--brand-500); color: var(--brand-500); }
+.chip.is-active { background: var(--brand-500); border-color: var(--brand-500); color: #fff; }
+.chip-count { font-size: 0.72rem; opacity: 0.7; }
+
+/* Label text for screen readers where the control is self-evident visually. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-muted);
+}
+.empty-state-icon { font-size: 3rem; line-height: 1; }
+
+footer a { color: inherit; opacity: 0.75; text-decoration: none; transition: opacity var(--fast); }
+footer a:hover { opacity: 1; }

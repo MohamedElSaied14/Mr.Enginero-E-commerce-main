@@ -1,0 +1,146 @@
+[
+  {
+    "name": "01-home-desktop",
+    "file": "01-home-desktop.png",
+    "path": "/",
+    "viewport": "1440×900",
+    "caption": "Home — hero, live counters and category tiles",
+    "kb": 392
+  },
+  {
+    "name": "02-home-mobile",
+    "file": "02-home-mobile.png",
+    "path": "/",
+    "viewport": "390×844",
+    "caption": "Home on a phone — category tiles collapse to a dropdown",
+    "kb": 144
+  },
+  {
+    "name": "03-shop-desktop",
+    "file": "03-shop-desktop.png",
+    "path": "/shop",
+    "viewport": "1440×900",
+    "caption": "Shop — filter sidebar, sort and 24-per-page grid",
+    "kb": 176
+  },
+  {
+    "name": "04-shop-mobile",
+    "file": "04-shop-mobile.png",
+    "path": "/shop",
+    "viewport": "390×844",
+    "caption": "Shop on a phone — filters behind a button with an active count",
+    "kb": 26
+  },
+  {
+    "name": "05-product-desktop",
+    "file": "05-product-desktop.png",
+    "path": "/product/3",
+    "viewport": "1440×900",
+    "caption": "Product — gallery, original price, stock and related items",
+    "kb": 350
+  },
+  {
+    "name": "06-product-mobile",
+    "file": "06-product-mobile.png",
+    "path": "/product/3",
+    "viewport": "390×844",
+    "caption": "Product on a phone — single column, 44px quantity stepper",
+    "kb": 177
+  },
+  {
+    "name": "07-deals-desktop",
+    "file": "07-deals-desktop.png",
+    "path": "/deals",
+    "viewport": "1440×900",
+    "caption": "Deals — only genuine reductions, biggest discount first",
+    "kb": 385
+  },
+  {
+    "name": "08-cart-mobile",
+    "file": "08-cart-mobile.png",
+    "path": "/cart",
+    "viewport": "390×844",
+    "caption": "Cart on a phone — lines reflow, summary below",
+    "kb": 35
+  },
+  {
+    "name": "09-checkout-desktop",
+    "file": "09-checkout-desktop.png",
+    "path": "/checkout",
+    "viewport": "1440×900",
+    "caption": "Checkout — cash on delivery, live totals",
+    "kb": 65
+  },
+  {
+    "name": "10-checkout-mobile",
+    "file": "10-checkout-mobile.png",
+    "path": "/checkout",
+    "viewport": "390×844",
+    "caption": "Checkout on a phone — 16px inputs so iOS does not zoom",
+    "kb": 35
+  },
+  {
+    "name": "11-login-desktop",
+    "file": "11-login-desktop.png",
+    "path": "/login",
+    "viewport": "1440×900",
+    "caption": "Sign in — Google SSO, no demo accounts",
+    "kb": 56
+  },
+  {
+    "name": "12-register-desktop",
+    "file": "12-register-desktop.png",
+    "path": "/register",
+    "viewport": "1440×900",
+    "caption": "Register — 8-character minimum, email verification explained",
+    "kb": 47
+  },
+  {
+    "name": "13-dashboard-orders",
+    "file": "13-dashboard-orders.png",
+    "path": "/dashboard",
+    "viewport": "1440×900",
+    "caption": "Dashboard · Orders — KPIs, mail-transport banner, order board",
+    "kb": 103
+  },
+  {
+    "name": "14-dashboard-catalogue",
+    "file": "14-dashboard-catalogue.png",
+    "path": "/dashboard?tab=catalogue",
+    "viewport": "1440×900",
+    "caption": "Dashboard · Catalogue — price provenance per product",
+    "kb": 94
+  },
+  {
+    "name": "15-dashboard-users",
+    "file": "15-dashboard-users.png",
+    "path": "/dashboard?tab=users",
+    "viewport": "1440×900",
+    "caption": "Dashboard · Users — roles, verification, protected accounts",
+    "kb": 100
+  },
+  {
+    "name": "16-dashboard-settings",
+    "file": "16-dashboard-settings.png",
+    "path": "/dashboard?tab=settings",
+    "viewport": "1440×900",
+    "caption": "Dashboard · Settings — live fees and system status",
+    "kb": 108
+  },
+  {
+    "name": "17-suppliers-desktop",
+    "file": "17-suppliers-desktop.png",
+    "path": "/stores",
+    "viewport": "1440×900",
+    "caption": "Supplier directory — Alexandria shops, Sigma flagged not connected",
+    "kb": 115
+  },
+  {
+    "name": "18-dashboard-mobile",
+    "file": "18-dashboard-mobile.png",
+    "path": "/dashboard",
+    "viewport": "390×844",
+    "caption": "Dashboard on a phone — tabs scroll, cards stack",
+    "kb": 49
+  }
+]

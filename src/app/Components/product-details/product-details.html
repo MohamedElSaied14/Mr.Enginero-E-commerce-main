@@ -1,0 +1,169 @@
+@if (loading()) {
+  <div class="page pdp">
+    <div class="pdp-grid">
+      <div class="skeleton" style="aspect-ratio:1/1;border-radius:var(--radius-lg)"></div>
+      <div class="pdp-info">
+        <div class="skeleton" style="height:12px;width:25%"></div>
+        <div class="skeleton" style="height:28px;width:85%"></div>
+        <div class="skeleton" style="height:28px;width:55%"></div>
+        <div class="skeleton" style="height:40px;width:40%;margin-top:1rem"></div>
+        <div class="skeleton" style="height:100px;margin-top:1rem"></div>
+      </div>
+    </div>
+  </div>
+} @else if (notFound() || !product()) {
+  <div class="page">
+    <div class="empty-state">
+      <div class="empty-state-icon">🧭</div>
+      <h1 class="h4 mt-3">We couldn't find that product</h1>
+      <p>It may have been removed from the catalogue.</p>
+      <button type="button" class="btn btn-brand mt-2" (click)="backToShop()">Back to the shop</button>
+    </div>
+  </div>
+} @else {
+  <div class="page pdp">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a>
+      <span aria-hidden="true">/</span>
+      <a [routerLink]="['/shop']" [queryParams]="{ categoryId: product()!.categoryId }">{{ product()!.category }}</a>
+      <span aria-hidden="true">/</span>
+      <span class="crumb-current">{{ product()!.brand }}</span>
+    </nav>
+
+    <div class="pdp-grid">
+      <!-- Gallery -->
+      <div class="pdp-gallery">
+        <div class="gallery-main">
+          <img
+            [src]="gallery()[activeImage()]"
+            [alt]="product()!.name"
+            width="640"
+            height="640"
+            fetchpriority="high"
+            decoding="async"
+          />
+          @if (product()!.discount > 0) {
+            <span class="pill pill-sale gallery-badge">−{{ product()!.discount }}%</span>
+          }
+        </div>
+
+        @if (gallery().length > 1) {
+          <div class="gallery-thumbs" role="tablist" aria-label="Product images">
+            @for (image of gallery(); track image; let i = $index) {
+              <button
+                type="button"
+                role="tab"
+                class="gallery-thumb"
+                [class.is-active]="activeImage() === i"
+                [attr.aria-selected]="activeImage() === i"
+                (click)="selectImage(i)"
+              >
+                <img [src]="image" [alt]="'View ' + (i + 1)" loading="lazy" decoding="async" width="80" height="80" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Buy box -->
+      <div class="pdp-info">
+        <p class="pdp-brand">{{ product()!.brand }}</p>
+        <h1 class="pdp-title">{{ product()!.name }}</h1>
+
+        <p class="pdp-rating">
+          <span class="stars" aria-hidden="true">{{ starBar() }}</span>
+          <span>{{ product()!.rating }} / 5</span>
+          <span class="text-muted">· {{ product()!.reviewCount }} reviews</span>
+        </p>
+
+        <div class="pdp-prices">
+          <span class="pdp-price-now">{{ product()!.price | calc }}</span>
+          @if (product()!.discount > 0) {
+            <span class="price-was">{{ product()!.originalPrice | calc }}</span>
+            <span class="pdp-save">You save {{ savings() | calc }} ({{ product()!.discount }}%)</span>
+          }
+        </div>
+
+        <p class="pdp-stock" [class.is-out]="isSoldOut()" [class.is-low]="!isSoldOut() && product()!.quantity <= 5">
+          @if (isSoldOut()) {
+            ✕ Out of stock — check back soon
+          } @else if (product()!.quantity <= 5) {
+            ⚡ Only {{ product()!.quantity }} left in stock
+          } @else {
+            ✓ In stock — {{ product()!.quantity }} available
+          }
+        </p>
+
+        <div class="pdp-buy">
+          <div class="qty-stepper" role="group" aria-label="Quantity">
+            <button type="button" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1" aria-label="Decrease quantity">−</button>
+            <span class="qty-value" aria-live="polite">{{ quantity() }}</span>
+            <button type="button" (click)="changeQuantity(1)" [disabled]="quantity() >= maxQuantity()" aria-label="Increase quantity">+</button>
+          </div>
+
+          <button type="button" class="btn btn-brand btn-lg pdp-add" [disabled]="isSoldOut()" (click)="addToCart()">
+            {{ isSoldOut() ? 'Out of stock' : 'Add to cart · ' + (product()!.price * quantity() | calc) }}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-ghost pdp-wish"
+            [class.is-on]="wishlist.isWishlisted(product()!.id)"
+            (click)="toggleWishlist()"
+          >
+            {{ wishlist.isWishlisted(product()!.id) ? '♥ Saved' : '♡ Save' }}
+          </button>
+        </div>
+
+        @if (inCart() > 0) {
+          <p class="pdp-incart">{{ inCart() }} already in your cart.</p>
+        }
+
+        <ul class="pdp-assurances">
+          <li>🚚 Next-day delivery in Cairo &amp; Giza</li>
+          <li>🛡️ Official local agent warranty</li>
+          <li>↩️ 14-day returns on unopened items</li>
+        </ul>
+
+        @if (product()!.tags.length) {
+          <div class="pdp-tags">
+            @for (tag of product()!.tags; track tag) {
+              <a class="chip chip-sm" [routerLink]="['/shop']" [queryParams]="{ q: tag }">{{ tag }}</a>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Description -->
+    <section class="pdp-section surface-card">
+      <h2 class="pdp-section-title">About this product</h2>
+      <p class="pdp-intro">{{ descriptionParts().intro }}</p>
+      @if (descriptionParts().bullets.length) {
+        <ul class="pdp-specs">
+          @for (bullet of descriptionParts().bullets; track bullet) {
+            <li>{{ bullet }}</li>
+          }
+        </ul>
+      }
+      <dl class="pdp-meta">
+        <div><dt>Brand</dt><dd>{{ product()!.brand }}</dd></div>
+        <div><dt>Category</dt><dd>{{ product()!.category }}</dd></div>
+        <div><dt>Product ID</dt><dd>#{{ product()!.id }}</dd></div>
+        <div><dt>Availability</dt><dd>{{ isSoldOut() ? 'Out of stock' : product()!.quantity + ' units' }}</dd></div>
+      </dl>
+    </section>
+
+    <!-- Related -->
+    @if (product()!.related.length) {
+      <section class="pdp-section-plain">
+        <h2 class="section-title pdp-related-title">More in {{ product()!.category }}</h2>
+        <div class="product-grid">
+          @for (related of product()!.related; track related.id) {
+            <app-product-card [product]="related" />
+          }
+        </div>
+      </section>
+    }
+  </div>
+}

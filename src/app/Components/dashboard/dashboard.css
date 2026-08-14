@@ -1,0 +1,265 @@
+.dash { max-width: 1440px; }
+
+.dash-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-block: 0.5rem 1.5rem;
+}
+.dash-welcome { margin: 0.35rem 0 0; font-size: 0.85rem; color: var(--text-muted); }
+.dash-head-actions { display: flex; gap: 0.5rem; }
+
+.muted { color: var(--text-muted); font-weight: 400; }
+.nowrap { white-space: nowrap; }
+
+/* ===== Tabs =============================================================== */
+
+.dash-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.35rem;
+  /* Four tabs need to scroll rather than wrap on a narrow phone. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dash-tabs::-webkit-scrollbar { display: none; }
+.dash-tab { flex: 0 0 auto; }
+.dash-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.1rem;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--fast) var(--ease);
+}
+.dash-tab:hover { color: var(--text); }
+.dash-tab.is-active { color: var(--brand-500); border-bottom-color: var(--brand-500); }
+
+.tab-badge {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 0.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--warning);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ===== Price provenance =================================================== */
+
+.source-cell { min-width: 170px; }
+.source-link {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brand-500);
+  text-decoration: none;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.source-link:hover { text-decoration: underline; }
+.source-meta { display: block; font-size: 0.7rem; color: var(--text-subtle); }
+.source-drift { display: block; font-size: 0.7rem; color: var(--warning); font-weight: 600; }
+
+.source-fieldset {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem 0.75rem;
+  margin: 0;
+}
+.source-fieldset legend { padding-inline: 0.4rem; width: auto; float: none; }
+.admin-only {
+  margin-inline-start: 0.4rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--brand-50);
+  color: var(--brand-500);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+}
+.source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+.source-hint { margin: 0.6rem 0 0; font-size: 0.74rem; color: var(--text-subtle); line-height: 1.5; }
+
+/* ===== KPI cards ========================================================== */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 1rem 1.1rem;
+  /* The tone shows up as a coloured spine rather than a coloured card. */
+  border-inline-start: 3px solid var(--brand-500);
+}
+.stat-card[data-tone='success'] { border-inline-start-color: var(--success); }
+.stat-card[data-tone='danger'] { border-inline-start-color: var(--danger); }
+.stat-card[data-tone='accent'] { border-inline-start-color: var(--accent); }
+
+.stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.stat-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+
+/* ===== Panels ============================================================= */
+
+.dash-panel { padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; }
+.panel-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.85rem; }
+
+.cat-bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.cat-bar-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 44px 120px;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+.cat-bar-name { color: var(--text-muted); }
+.cat-bar-track { height: 8px; border-radius: var(--radius-pill); background: var(--surface-sunken); overflow: hidden; }
+.cat-bar-fill { display: block; height: 100%; border-radius: inherit; background: var(--brand-500); }
+.cat-bar-count { font-weight: 600; text-align: right; }
+.cat-bar-value { text-align: right; color: var(--text-muted); }
+
+/* ===== Editor ============================================================= */
+
+.editor { border-color: var(--brand-300); }
+.editor-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+}
+.field { display: flex; flex-direction: column; gap: 0.3rem; }
+.field-wide { grid-column: 1 / -1; }
+.field-inline { flex-direction: row; align-items: center; gap: 0.5rem; grid-column: 1 / -1; }
+.field-inline .form-check-input { margin: 0; }
+.field-label { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+
+.preview-body {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+.preview-img {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+}
+.preview-empty { display: grid; place-items: center; font-size: 0.75rem; color: var(--text-subtle); }
+.preview-prices { display: flex; gap: 0.5rem; align-items: baseline; margin: 0.25rem 0; }
+.preview-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.editor-actions { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 1rem; }
+.editor-hint { font-size: 0.8rem; color: var(--text-muted); }
+
+/* ===== Table ============================================================== */
+
+.table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.table-search { max-width: 280px; }
+.table-filters { margin-bottom: 0.85rem; }
+.chip-static { cursor: default; font-size: 0.75rem; padding: 0.2rem 0.6rem; }
+
+.cell-product { display: flex; align-items: center; gap: 0.65rem; min-width: 260px; }
+.cell-thumb {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+}
+.cell-copy { display: flex; flex-direction: column; min-width: 0; }
+.cell-name {
+  font-weight: 600;
+  font-size: 0.87rem;
+  /* Long retailer titles must not stretch the table. */
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 380px;
+}
+.cell-desc {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 380px;
+}
+
+.stock-badge {
+  display: inline-block;
+  min-width: 42px;
+  text-align: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--success-soft);
+  color: var(--success);
+}
+.stock-badge.is-low { background: var(--accent-soft); color: var(--warning); }
+.stock-badge.is-out { background: var(--danger-soft); color: var(--danger); }
+
+.btn-danger-ghost:hover { border-color: var(--danger); color: var(--danger); }
+.btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 767px) {
+  .cat-bar-row { grid-template-columns: 110px minmax(0, 1fr) 36px; }
+  .cat-bar-value { display: none; }
+  .table-search { max-width: none; width: 100%; }
+}

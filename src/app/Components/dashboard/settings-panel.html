@@ -1,0 +1,150 @@
+@if (loading()) {
+  <span class="skeleton d-block" style="height:120px;margin-bottom:1rem"></span>
+  <span class="skeleton d-block" style="height:260px"></span>
+} @else {
+
+  <!-- Anything still to configure, stated plainly rather than left to discover -->
+  @if (warnings().length) {
+    <section class="surface-card warn-panel">
+      <h2 class="panel-title">{{ warnings().length }} thing(s) still to set up</h2>
+      <ul class="warn-list">
+        @for (w of warnings(); track w.text) {
+          <li>
+            <span class="warn-mark" aria-hidden="true">!</span>
+            <span>
+              <strong>{{ w.text }}</strong>
+              @if (w.fix) { <span class="warn-fix">{{ w.fix }}</span> }
+            </span>
+          </li>
+        }
+      </ul>
+    </section>
+  } @else {
+    <section class="surface-card ok-panel">
+      <span class="ok-mark" aria-hidden="true">✓</span>
+      Everything is configured — database, email, Google sign-in and secrets are all set.
+    </section>
+  }
+
+  <div class="settings-grid">
+    <!-- Editable store settings -->
+    <section class="surface-card dash-panel">
+      <h2 class="panel-title">Delivery &amp; checkout</h2>
+      <p class="panel-sub">These apply to the next order placed — no restart needed.</p>
+
+      <div class="field-grid">
+        <label class="field">
+          <span class="field-label">Delivery fee (EGP)</span>
+          <input type="number" class="form-control" min="0" [value]="form()!.shippingFee"
+                 (input)="patchNumber('shippingFee', $any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Free delivery over (EGP)</span>
+          <input type="number" class="form-control" min="0" [value]="form()!.freeShippingOver"
+                 (input)="patchNumber('freeShippingOver', $any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Cash-handling fee (EGP)</span>
+          <input type="number" class="form-control" min="0" [value]="form()!.codFee"
+                 (input)="patchNumber('codFee', $any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Max units per line</span>
+          <input type="number" class="form-control" min="1" max="100" [value]="form()!.maxUnitsPerLine"
+                 (input)="patchNumber('maxUnitsPerLine', $any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Low-stock warning below</span>
+          <input type="number" class="form-control" min="0" [value]="form()!.lowStockThreshold"
+                 (input)="patchNumber('lowStockThreshold', $any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Support hours</span>
+          <input class="form-control" [value]="form()!.supportHours"
+                 (input)="patch('supportHours', $any($event.target).value)" />
+        </label>
+      </div>
+
+      <label class="switch-row">
+        <input type="checkbox" class="form-check-input" [checked]="form()!.acceptingOrders"
+               (change)="patch('acceptingOrders', $any($event.target).checked)" />
+        <span>
+          <strong>Accepting orders</strong>
+          <span class="switch-hint">
+            Turn this off during stocktaking — checkout tells customers to message you on WhatsApp instead.
+          </span>
+        </span>
+      </label>
+
+      <div class="settings-actions">
+        <button type="button" class="btn btn-brand" [disabled]="!dirty() || saving()" (click)="save()">
+          {{ saving() ? 'Saving…' : 'Save settings' }}
+        </button>
+        <button type="button" class="btn btn-ghost" [disabled]="!dirty()" (click)="revert()">Revert</button>
+        @if (dirty()) { <span class="unsaved">Unsaved changes</span> }
+      </div>
+    </section>
+
+    <!-- Read-only system status -->
+    <aside class="surface-card dash-panel">
+      <h2 class="panel-title">System</h2>
+
+      <dl class="status-list">
+        <div>
+          <dt>Database</dt>
+          <dd>
+            @if (system()!.database.connected) {
+              <span class="dot is-ok"></span>{{ system()!.database.name }}
+            } @else {
+              <span class="dot is-bad"></span>unreachable
+            }
+          </dd>
+        </div>
+
+        <div>
+          <dt>Order email</dt>
+          <dd>
+            @if (system()!.mail.configured) {
+              <span class="dot is-ok"></span>sending to {{ system()!.mail.managerInbox }}
+            } @else {
+              <span class="dot is-warn"></span>log only
+            }
+          </dd>
+        </div>
+
+        <div>
+          <dt>Google sign-in</dt>
+          <dd>
+            <span class="dot" [class.is-ok]="system()!.googleSignIn.configured" [class.is-warn]="!system()!.googleSignIn.configured"></span>
+            {{ system()!.googleSignIn.configured ? 'configured' : 'not configured' }}
+          </dd>
+        </div>
+
+        <div>
+          <dt>Auth secret</dt>
+          <dd>
+            <span class="dot" [class.is-ok]="!system()!.authSecretIsDefault" [class.is-bad]="system()!.authSecretIsDefault"></span>
+            {{ system()!.authSecretIsDefault ? 'development default' : 'set' }}
+          </dd>
+        </div>
+
+        <div><dt>Public origin</dt><dd>{{ system()!.publicOrigin ?? 'not set' }}</dd></div>
+        <div><dt>Owner addresses</dt><dd>{{ system()!.adminEmails.join(', ') || 'none' }}</dd></div>
+      </dl>
+
+      <dl class="count-grid">
+        <div><dt>Products</dt><dd>{{ system()!.counts.products }}</dd></div>
+        <div><dt>Orders</dt><dd>{{ system()!.counts.orders }}</dd></div>
+        <div><dt>Accounts</dt><dd>{{ system()!.counts.users }}</dd></div>
+      </dl>
+
+      <p class="status-foot">Node {{ system()!.node }} · up {{ uptime() }}</p>
+      <button type="button" class="btn btn-ghost btn-sm w-100" (click)="load()">Refresh status</button>
+    </aside>
+  </div>
+}

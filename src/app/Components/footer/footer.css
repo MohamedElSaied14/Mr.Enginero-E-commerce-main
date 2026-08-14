@@ -1,0 +1,104 @@
+.site-footer {
+  margin-top: auto;
+  background: #150b11;
+  color: #e6dee1;
+}
+/* Encapsulated styles cannot reach the root by selector — see home.css. */
+:host-context([data-theme='dark']) .site-footer { background: #08080f; }
+
+.footer-inner {
+  max-width: 1320px;
+  margin-inline: auto;
+  padding: 3rem 1.25rem 2rem;
+  display: grid;
+  grid-template-columns: minmax(240px, 1.6fr) repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+}
+.footer-logo img {
+  width: 44px;
+  height: 44px;
+  /* The supplied artwork keeps its own padding — contain, never crop. */
+  object-fit: contain;
+}
+.footer-logo .dot { color: var(--brand-300); }
+
+.footer-social { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+.social-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0.45rem 0.95rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(230, 222, 225, 0.9);
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: background-color var(--fast) var(--ease), border-color var(--fast) var(--ease),
+    color var(--fast) var(--ease), box-shadow var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.social-btn:hover { color: #fff; border-color: transparent; }
+.social-fb:hover { background: #1877F2; }
+.social-wa:hover { background: #25D366; }
+.footer-blurb {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: rgba(230, 222, 225, 0.62);
+  max-width: 42ch;
+}
+
+.footer-col { display: flex; flex-direction: column; gap: 0.5rem; }
+.footer-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(230, 222, 225, 0.45);
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+.footer-col a,
+.footer-col span {
+  font-size: 0.86rem;
+  color: rgba(230, 222, 225, 0.78);
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+/* Footer links are a common mis-tap on a phone — give them real height. */
+.footer-col a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+}
+.footer-col a:hover { color: #fff; }
+
+.footer-base {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 1.1rem 1.25rem;
+}
+.footer-base p {
+  max-width: 1320px;
+  margin-inline: auto;
+  margin-block: 0;
+  font-size: 0.76rem;
+  color: rgba(230, 222, 225, 0.45);
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem; }
+}
+@media (max-width: 480px) {
+  .footer-inner { grid-template-columns: minmax(0, 1fr); }
+}

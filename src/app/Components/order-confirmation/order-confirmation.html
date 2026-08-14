@@ -1,0 +1,110 @@
+@if (loading()) {
+  <div class="page">
+    <div class="skeleton" style="height:120px;border-radius:var(--radius-lg)"></div>
+    <div class="skeleton" style="height:280px;margin-top:1rem;border-radius:var(--radius-lg)"></div>
+  </div>
+} @else if (notFound() || !order()) {
+  <div class="page">
+    <div class="empty-state">
+      <div class="empty-state-icon">🔎</div>
+      <h1 class="h4 mt-3">We couldn't find that order</h1>
+      <p>Check the reference number, or message us on WhatsApp and we will look it up.</p>
+      <a class="btn btn-ghost mt-2" [href]="whatsappLink" target="_blank" rel="noopener">WhatsApp {{ brand.phone.display }}</a>
+      <a class="btn btn-brand mt-2" routerLink="/shop">Back to the shop</a>
+    </div>
+  </div>
+} @else {
+  <div class="page confirm">
+    <header class="confirm-hero" [class.is-cancelled]="isCancelled()">
+      <span class="confirm-mark" aria-hidden="true">{{ isCancelled() ? '✕' : '✓' }}</span>
+      <h1 class="confirm-title">
+        {{ isCancelled() ? 'This order was cancelled' : 'Thank you — your order is in' }}
+      </h1>
+      <p class="confirm-ref">Reference <strong>{{ order()!.ref }}</strong> · placed {{ placedAt() }}</p>
+
+      @if (!isCancelled()) {
+        <p class="confirm-lead">
+          We have reserved your items. A member of our team will call
+          <strong>{{ order()!.customer.phone }}</strong> to confirm the delivery time. You pay
+          <strong>{{ order()!.total | calc }}</strong> in cash when it arrives — nothing has been charged.
+        </p>
+        @if (order()!.receiptEmailed) {
+          <p class="confirm-email">A copy of this receipt has been emailed to {{ order()!.customer.email }}.</p>
+        } @else {
+          <p class="confirm-email">Save this page or note the reference — we will confirm everything by phone.</p>
+        }
+      }
+    </header>
+
+    @if (!isCancelled()) {
+      <ol class="tracker" aria-label="Order progress">
+        @for (step of steps; track step.value; let i = $index) {
+          <li class="tracker-step" [class.is-done]="stepReached(i)" [class.is-current]="i === reachedIndex()">
+            <span class="tracker-dot" aria-hidden="true"></span>
+            <span class="tracker-label">{{ step.label }}</span>
+          </li>
+        }
+      </ol>
+    }
+
+    <div class="confirm-grid">
+      <section class="surface-card confirm-card">
+        <h2 class="card-title">What you ordered</h2>
+        <ul class="order-items">
+          @for (item of order()!.items; track item.productId) {
+            <li>
+              <a [routerLink]="['/product', item.productId]" class="order-thumb">
+                <img [src]="item.imgUrl" [alt]="" loading="lazy" decoding="async" width="56" height="56" />
+              </a>
+              <span class="order-item-copy">
+                <a class="order-item-name" [routerLink]="['/product', item.productId]">{{ item.name }}</a>
+                <span class="order-item-qty">{{ item.quantity }} × {{ item.unitPrice | calc }}</span>
+              </span>
+              <span class="order-item-total">{{ item.lineTotal | calc }}</span>
+            </li>
+          }
+        </ul>
+
+        <dl class="order-totals">
+          <div><dt>Subtotal</dt><dd>{{ order()!.subtotal | calc }}</dd></div>
+          @if (order()!.savings > 0) {
+            <div class="is-saving"><dt>You saved</dt><dd>− {{ order()!.savings | calc }}</dd></div>
+          }
+          <div><dt>Delivery</dt><dd>{{ order()!.shipping === 0 ? 'Free' : (order()!.shipping | calc) }}</dd></div>
+          @if (order()!.codFee > 0) {
+            <div><dt>Cash-on-delivery fee</dt><dd>{{ order()!.codFee | calc }}</dd></div>
+          }
+          <div class="is-total">
+            <dt>{{ order()!.paymentStatus === 'paid' ? 'Paid on delivery' : 'Pay on delivery' }}</dt>
+            <dd>{{ order()!.total | calc }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <aside class="surface-card confirm-card">
+        <h2 class="card-title">Delivery details</h2>
+        <address class="delivery-block">
+          <strong>{{ order()!.customer.name }}</strong><br />
+          {{ order()!.customer.phone }}<br />
+          {{ order()!.address.street }}<br />
+          {{ order()!.address.city }}, {{ order()!.address.governorate }}
+          @if (order()!.address.notes) {
+            <span class="delivery-note">Note: {{ order()!.address.notes }}</span>
+          }
+        </address>
+
+        <h2 class="card-title mt-3">Need to change something?</h2>
+        <p class="help-text">
+          Message us on <a [href]="orderWhatsappLink()" target="_blank" rel="noopener">WhatsApp</a>,
+          call <a [href]="telLink">{{ brand.phone.display }}</a>, or write to
+          <a [href]="mailLink">{{ brand.email }}</a> quoting {{ order()!.ref }}.
+        </p>
+
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-ghost" (click)="print()">Print receipt</button>
+          <a class="btn btn-brand" routerLink="/shop">Keep shopping</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+}

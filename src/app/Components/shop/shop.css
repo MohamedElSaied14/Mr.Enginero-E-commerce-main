@@ -1,0 +1,204 @@
+.shop-head {
+  text-align: center;
+  padding: 1rem 0 1.75rem;
+}
+.shop-head-meta {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ===== Toolbar ============================================================ */
+
+.shop-toolbar {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 20;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.75rem;
+  margin-bottom: 1.25rem;
+  /* Sits over the scrolling grid, so it needs its own opaque backdrop. */
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+}
+
+.search-field {
+  position: relative;
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+}
+.search-field .form-control {
+  padding-inline-start: 2.35rem;
+  padding-block: 0.6rem;
+}
+.search-icon {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.search-spinner {
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brand-500);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toolbar-right {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.filters-toggle { display: none; align-items: center; gap: 0.4rem; }
+.filter-count {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 0.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--brand-500);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.sort-field .form-select { min-width: 190px; }
+
+/* ===== Layout ============================================================= */
+
+.shop-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.shop-filters {
+  position: sticky;
+  top: calc(var(--header-h) + 5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding: 1.15rem;
+  max-height: calc(100vh - var(--header-h) - 6rem);
+  overflow-y: auto;
+}
+
+.filter-block { display: flex; flex-direction: column; gap: 0.6rem; }
+.filter-title {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+/* Category picker: chips on desktop, a dropdown once space is tight. */
+.cat-select { display: none; }
+@media (max-width: 640px) {
+  .cat-select { display: block; }
+  .cat-chips { display: none; }
+}
+.filter-block > .chip { align-self: flex-start; }
+
+.price-row { display: flex; align-items: center; gap: 0.5rem; }
+.price-row .form-control { min-width: 0; }
+
+.supplier-list { list-style: none; margin: 0.35rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.supplier-option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.35rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  /* 40px keeps this a comfortable tap target on a phone. */
+  min-height: 40px;
+}
+.supplier-option:hover { background: var(--surface-sunken); }
+.supplier-option .form-check-input { margin: 0; flex: 0 0 auto; }
+.supplier-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.supplier-name { font-size: 0.83rem; font-weight: 500; }
+.supplier-where { font-size: 0.72rem; color: var(--text-subtle); }
+
+.brand-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-inline-end: 0.25rem;
+}
+.brand-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* 40px so the row is a real tap target once the sidebar is open on a phone. */
+  min-height: 40px;
+  padding: 0.3rem 0.35rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.brand-option:hover { background: var(--surface-sunken); }
+.brand-option .chip-count { margin-inline-start: auto; }
+.brand-option .form-check-input { margin: 0; flex: 0 0 auto; }
+
+/* ===== Results ============================================================ */
+
+.results-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 0.85rem;
+}
+
+/* A refetch dims the current page rather than blanking it out. */
+.product-grid.is-refreshing {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity var(--fast) var(--ease);
+}
+
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 2.5rem;
+}
+
+/* ===== Responsive ========================================================= */
+
+@media (max-width: 991px) {
+  .shop-layout { grid-template-columns: minmax(0, 1fr); }
+  .filters-toggle { display: inline-flex; }
+  .shop-filters {
+    position: static;
+    max-height: none;
+    /* Collapsed by default on small screens; the Filters button reveals it. */
+    display: none;
+  }
+  .shop-filters.is-open { display: flex; }
+  .sort-field .form-select { min-width: 150px; }
+}
+
+@media (max-width: 575px) {
+  .shop-toolbar { position: static; }
+  .toolbar-right { width: 100%; }
+  .sort-field { flex: 1; }
+  .sort-field .form-select { width: 100%; }
+}

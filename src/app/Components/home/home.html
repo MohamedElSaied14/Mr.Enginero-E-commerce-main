@@ -1,0 +1,123 @@
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Egypt · PC hardware &amp; gaming gear</p>
+    <h1 class="hero-title">Parts you can trust,<br />prices you can check.</h1>
+    <p class="hero-sub">
+      {{ totals().products || 150 }} products in stock across GPUs, CPUs, laptops, monitors and peripherals —
+      every one listed with its original price so you can see exactly what you save.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-brand btn-lg" routerLink="/shop">Browse the shop</a>
+      <a class="btn btn-ghost btn-lg" routerLink="/deals">See today's deals</a>
+    </div>
+
+    <dl class="hero-stats">
+      <div><dt>Products</dt><dd>{{ totals().products || '—' }}</dd></div>
+      <div><dt>On sale now</dt><dd>{{ totals().onSale || '—' }}</dd></div>
+      <div><dt>Ready to ship</dt><dd>{{ totals().inStock || '—' }}</dd></div>
+    </dl>
+  </div>
+</section>
+
+<div class="page">
+  <!-- Categories -->
+  @if (categories().length) {
+    <section class="home-section">
+      <header class="home-section-head">
+        <h2 class="section-title">Shop by category</h2>
+      </header>
+      <!--
+        Eleven tiles is a long scroll on a phone, so below 640px the same list
+        collapses into a single select that jumps straight to the category.
+      -->
+      <label class="cat-select">
+        <span class="visually-hidden">Choose a category</span>
+        <select class="form-select" (change)="goToCategory($any($event.target).value)">
+          <option value="">Browse a category…</option>
+          @for (category of categories(); track category.id) {
+            <option [value]="category.id">{{ category.name }} ({{ category.count }})</option>
+          }
+        </select>
+      </label>
+
+      <div class="cat-grid">
+        @for (category of categories(); track category.id) {
+          <a class="cat-tile" [routerLink]="['/shop']" [queryParams]="{ categoryId: category.id }">
+            <span class="cat-tile-name">{{ category.name }}</span>
+            <span class="cat-tile-count">{{ category.count }} products</span>
+          </a>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Deals -->
+  <section class="home-section">
+    <header class="home-section-head">
+      <div>
+        <p class="section-eyebrow">Biggest savings right now</p>
+        <h2 class="section-title">On sale</h2>
+      </div>
+      <a class="btn btn-ghost" routerLink="/deals">All deals →</a>
+    </header>
+
+    @if (loading()) {
+      <div class="product-grid">
+        @for (s of skeletons; track $index) {
+          <div class="pcard">
+            <div class="skeleton" style="aspect-ratio:4/3"></div>
+            <div class="pcard-body">
+              <div class="skeleton" style="height:14px;width:80%"></div>
+              <div class="skeleton" style="height:20px;width:45%"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="product-grid">
+        @for (product of deals(); track product.id) {
+          <app-product-card [product]="product" [eager]="$index < 4" />
+        }
+      </div>
+    }
+  </section>
+
+  <!-- New arrivals -->
+  @if (arrivals().length) {
+    <section class="home-section">
+      <header class="home-section-head">
+        <div>
+          <p class="section-eyebrow">Just landed</p>
+          <h2 class="section-title">New arrivals</h2>
+        </div>
+        <a class="btn btn-ghost" [routerLink]="['/shop']" [queryParams]="{ sort: 'newest' }">See all →</a>
+      </header>
+      <div class="product-grid">
+        @for (product of arrivals(); track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Promises -->
+  <section class="home-section">
+    <div class="promise-grid">
+      @for (promise of promises; track promise.title) {
+        <div class="promise-card surface-card">
+          <span class="promise-icon" aria-hidden="true">{{ promise.icon }}</span>
+          <h3 class="promise-title">{{ promise.title }}</h3>
+          <p class="promise-text">{{ promise.text }}</p>
+        </div>
+      }
+    </div>
+  </section>
+</div>
+
+<!-- CTA -->
+<section class="cta">
+  <h2 class="cta-title">Building a new rig?</h2>
+  <p class="cta-sub">Tell us your budget and what you play — we will spec it, price it and build it free.</p>
+  <a class="btn btn-lg cta-btn" routerLink="/contact">Get a build quote</a>
+</section>

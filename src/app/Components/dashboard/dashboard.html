@@ -1,0 +1,328 @@
+<div class="page dash">
+  <header class="dash-head">
+    <div>
+      <p class="section-eyebrow">Admin</p>
+      <h1 class="section-title">Catalogue</h1>
+      <p class="dash-welcome">Signed in as {{ auth.userName() }} · data lives in MongoDB Atlas</p>
+    </div>
+    <div class="dash-head-actions">
+      @if (tab() === 'catalogue') {
+        <button type="button" class="btn btn-brand" (click)="openCreate()">+ New product</button>
+      }
+      <button type="button" class="btn btn-ghost" (click)="logout()">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="dash-tabs" role="tablist">
+    <button type="button" role="tab" class="dash-tab" [class.is-active]="tab() === 'orders'" [attr.aria-selected]="tab() === 'orders'" (click)="tab.set('orders')">
+      Orders
+      @if (pendingOrders() > 0) {
+        <span class="tab-badge">{{ pendingOrders() }}</span>
+      }
+    </button>
+    <button type="button" role="tab" class="dash-tab" [class.is-active]="tab() === 'catalogue'" [attr.aria-selected]="tab() === 'catalogue'" (click)="tab.set('catalogue')">
+      Catalogue
+    </button>
+    <button type="button" role="tab" class="dash-tab" [class.is-active]="tab() === 'users'" [attr.aria-selected]="tab() === 'users'" (click)="tab.set('users')">
+      Users
+    </button>
+    <button type="button" role="tab" class="dash-tab" [class.is-active]="tab() === 'settings'" [attr.aria-selected]="tab() === 'settings'" (click)="tab.set('settings')">
+      Settings
+    </button>
+  </div>
+
+  @if (tab() === 'orders') {
+    <app-orders-panel />
+  } @else if (tab() === 'users') {
+    <app-users-panel />
+  } @else if (tab() === 'settings') {
+    <app-settings-panel />
+  } @else {
+
+  <!-- KPI cards -->
+  <div class="stat-grid">
+    @for (card of statCards(); track card.label) {
+      <div class="stat-card surface-card" [attr.data-tone]="card.tone">
+        <span class="stat-value">{{ card.value }}</span>
+        <span class="stat-label">{{ card.label }}</span>
+      </div>
+    } @empty {
+      @for (s of [1,2,3,4,5,6]; track s) {
+        <div class="stat-card surface-card"><span class="skeleton" style="height:34px"></span></div>
+      }
+    }
+  </div>
+
+  <!-- Category mix -->
+  @if (categoryBars().length) {
+    <section class="surface-card dash-panel">
+      <h2 class="panel-title">Products &amp; inventory value by category</h2>
+      <ul class="cat-bars">
+        @for (bar of categoryBars(); track bar.category) {
+          <li class="cat-bar-row">
+            <span class="cat-bar-name">{{ bar.category }}</span>
+            <span class="cat-bar-track"><span class="cat-bar-fill" [style.width.%]="bar.pct"></span></span>
+            <span class="cat-bar-count">{{ bar.count }}</span>
+            <span class="cat-bar-value">{{ bar.value | calc }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <!-- Editor -->
+  @if (editorOpen()) {
+    <section class="surface-card dash-panel editor">
+      <div class="editor-head">
+        <h2 class="panel-title">{{ editingId() === null ? 'Add a product' : 'Edit product #' + editingId() }}</h2>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="closeEditor()">Close</button>
+      </div>
+
+      <div class="editor-grid">
+        <label class="field field-wide">
+          <span class="field-label">Product name *</span>
+          <input class="form-control" [value]="form().name" (input)="patch('name', $any($event.target).value)" placeholder="e.g. Gigabyte RTX 5070 Ti GAMING OC 16G" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Brand</span>
+          <input class="form-control" [value]="form().brand" (input)="patch('brand', $any($event.target).value)" placeholder="ASUS" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Category</span>
+          <select class="form-select" [value]="form().categoryId" (change)="patch('categoryId', +$any($event.target).value)">
+            @for (c of categories(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Selling price (EGP) *</span>
+          <input type="number" class="form-control" [value]="form().price ?? ''" (input)="patch('price', +$any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Original price (EGP)</span>
+          <input type="number" class="form-control" [value]="form().originalPrice ?? ''" (input)="patch('originalPrice', +$any($event.target).value)" placeholder="Leave equal to price if not on sale" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Stock</span>
+          <input type="number" class="form-control" [value]="form().quantity ?? 0" (input)="patch('quantity', +$any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Rating (0–5)</span>
+          <input type="number" step="0.1" max="5" min="0" class="form-control" [value]="form().rating ?? 0" (input)="patch('rating', +$any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Review count</span>
+          <input type="number" class="form-control" [value]="form().reviewCount ?? 0" (input)="patch('reviewCount', +$any($event.target).value)" />
+        </label>
+
+        <label class="field field-wide">
+          <span class="field-label">Main image URL</span>
+          <input class="form-control" [value]="form().imgUrl" (input)="patch('imgUrl', $any($event.target).value)" placeholder="https://…" />
+        </label>
+
+        <label class="field field-wide">
+          <span class="field-label">Extra gallery images (one URL per line)</span>
+          <textarea class="form-control" rows="2" [value]="form().extraImages" (input)="patch('extraImages', $any($event.target).value)"></textarea>
+        </label>
+
+        <label class="field field-wide">
+          <span class="field-label">Description *</span>
+          <textarea class="form-control" rows="4" [value]="form().description" (input)="patch('description', $any($event.target).value)" placeholder="What the product is, what it is good at, key specs…"></textarea>
+        </label>
+
+        <label class="field field-wide">
+          <span class="field-label">Tags (comma separated)</span>
+          <input class="form-control" [value]="form().tags" (input)="patch('tags', $any($event.target).value)" placeholder="gpu, nvidia, gaming" />
+        </label>
+
+        <label class="field field-inline">
+          <input type="checkbox" class="form-check-input" [checked]="form().isNew" (change)="patch('isNew', $any($event.target).checked)" />
+          <span>Show a “NEW” badge on this product</span>
+        </label>
+
+        <!-- Admin-only: never shown on the storefront. -->
+        <fieldset class="field field-wide source-fieldset">
+          <legend class="field-label">Where did this price come from? <span class="admin-only">admin only</span></legend>
+          <div class="source-grid">
+            <label class="field">
+              <span class="field-label">Retailer / supplier</span>
+              <input class="form-control" [value]="form().sourceRetailer" (input)="patch('sourceRetailer', $any($event.target).value)" placeholder="e.g. Elyamama Store" />
+            </label>
+            <label class="field">
+              <span class="field-label">Source link</span>
+              <input class="form-control" [value]="form().sourceUrl" (input)="patch('sourceUrl', $any($event.target).value)" placeholder="https://…" />
+            </label>
+            <label class="field field-wide">
+              <span class="field-label">Note</span>
+              <input class="form-control" [value]="form().sourceNote" (input)="patch('sourceNote', $any($event.target).value)" placeholder="Quoted over the phone, list price, competitor match…" />
+            </label>
+          </div>
+          <p class="source-hint">
+            Leave blank to keep the provenance already recorded. Customers never see this — it is stripped
+            from every public API response.
+          </p>
+        </fieldset>
+
+        <!-- Live preview so the admin sees the card before saving -->
+        <div class="field field-wide preview">
+          <span class="field-label">Preview</span>
+          <div class="preview-body">
+            @if (form().imgUrl) {
+              <img [src]="form().imgUrl" alt="" class="preview-img" loading="lazy" />
+            } @else {
+              <div class="preview-img preview-empty">No image</div>
+            }
+            <div>
+              <strong>{{ form().name || 'Product name' }}</strong>
+              <p class="preview-prices">
+                <span class="price-now">{{ (form().price ?? 0) | calc }}</span>
+                @if ((form().originalPrice ?? 0) > (form().price ?? 0)) {
+                  <span class="price-was">{{ form().originalPrice | calc }}</span>
+                }
+              </p>
+              <p class="preview-desc">{{ form().description || 'Description…' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-actions">
+        <button type="button" class="btn btn-brand" [disabled]="!formValid() || saving()" (click)="save()">
+          {{ saving() ? 'Saving…' : editingId() === null ? 'Add product' : 'Save changes' }}
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="closeEditor()">Cancel</button>
+        @if (!formValid()) {
+          <span class="editor-hint">Name, a price above zero and a description are required.</span>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Table -->
+  <section class="surface-card dash-panel">
+    <div class="table-head">
+      <h2 class="panel-title">All products <span class="muted">({{ total() }})</span></h2>
+      <input
+        type="search"
+        class="form-control table-search"
+        placeholder="Search name, brand, tags…"
+        [value]="search()"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+
+    <div class="chip-row table-filters">
+      <button type="button" class="chip" [class.is-active]="categoryFilter() === null" (click)="filterCategory(null)">All</button>
+      @for (c of categories(); track c.id) {
+        <button type="button" class="chip" [class.is-active]="categoryFilter() === c.id" (click)="filterCategory(c.id)">
+          {{ c.name }}<span class="chip-count">{{ c.count }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Product</th>
+            <th scope="col">Category</th>
+            <th scope="col" class="text-end">Price</th>
+            <th scope="col" class="text-end">Original</th>
+            <th scope="col">Price source</th>
+            <th scope="col">Stock</th>
+            <th scope="col">Rating</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading() && !rows().length) {
+            @for (s of [1,2,3,4,5,6,7,8]; track s) {
+              <tr><td colspan="9"><span class="skeleton d-block" style="height:44px"></span></td></tr>
+            }
+          }
+          @for (p of rows(); track p.id) {
+            <tr>
+              <td class="muted">{{ p.id }}</td>
+              <td>
+                <div class="cell-product">
+                  <img [src]="p.imgUrl" [alt]="p.name" class="cell-thumb" loading="lazy" decoding="async" width="48" height="48" />
+                  <div class="cell-copy">
+                    <span class="cell-name">{{ p.name }}</span>
+                    <span class="cell-desc">{{ p.brand }} · {{ p.description }}</span>
+                  </div>
+                </div>
+              </td>
+              <td><span class="chip chip-static">{{ p.category }}</span></td>
+              <td class="text-end fw-semibold">{{ p.price | calc }}</td>
+              <td class="text-end">
+                @if (p.discount > 0) {
+                  <span class="price-was">{{ p.originalPrice | calc }}</span>
+                  <span class="pill pill-sale ms-1">−{{ p.discount }}%</span>
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td class="source-cell">
+                @if (p.priceSource) {
+                  @if (p.priceSource.url) {
+                    <a class="source-link" [href]="p.priceSource.url" target="_blank" rel="noopener noreferrer"
+                       [title]="p.priceSource.retailer + ' — ' + p.priceSource.url">
+                      {{ p.priceSource.retailer }} ↗
+                    </a>
+                  } @else {
+                    <span class="source-link">{{ p.priceSource.retailer }}</span>
+                  }
+                  <span class="source-meta">
+                    captured {{ capturedOn(p) }} at {{ p.priceSource.capturedPrice | calc }}
+                  </span>
+                  @if (priceDrift(p) !== 0) {
+                    <span class="source-drift">
+                      now {{ priceDrift(p) > 0 ? '+' : '' }}{{ priceDrift(p) | calc }} vs source
+                    </span>
+                  }
+                } @else {
+                  <span class="muted">Not recorded</span>
+                }
+              </td>
+              <td>
+                <span class="stock-badge" [class.is-out]="p.quantity === 0" [class.is-low]="p.quantity > 0 && p.quantity <= 5">
+                  {{ p.quantity === 0 ? 'Out' : p.quantity }}
+                </span>
+              </td>
+              <td class="nowrap">★ {{ p.rating }} <span class="muted">({{ p.reviewCount }})</span></td>
+              <td class="text-end nowrap">
+                @if (confirmingDelete() === p.id) {
+                  <button type="button" class="btn btn-sm btn-danger" (click)="confirmDelete(p.id)">Confirm</button>
+                  <button type="button" class="btn btn-sm btn-ghost" (click)="cancelDelete()">Cancel</button>
+                } @else {
+                  <button type="button" class="btn btn-sm btn-ghost" (click)="openEdit(p)">Edit</button>
+                  <button type="button" class="btn btn-sm btn-ghost btn-danger-ghost" (click)="askDelete(p.id)">Delete</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination-row" aria-label="Table pages">
+        <button type="button" class="btn btn-ghost btn-sm" [disabled]="page() === 1" (click)="goToPage(page() - 1)">← Prev</button>
+        <span class="muted">Page {{ page() }} of {{ totalPages() }}</span>
+        <button type="button" class="btn btn-ghost btn-sm" [disabled]="page() === totalPages()" (click)="goToPage(page() + 1)">Next →</button>
+      </nav>
+    }
+  </section>
+
+  }
+</div>

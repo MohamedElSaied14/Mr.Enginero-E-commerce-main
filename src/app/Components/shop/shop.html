@@ -1,0 +1,242 @@
+<div class="page shop">
+  <header class="shop-head">
+    <p class="section-eyebrow">Curated for you</p>
+    <h1 class="section-title">The Collection</h1>
+    <div class="section-divider"></div>
+    @if (facets().totals.products) {
+      <p class="shop-head-meta">
+        {{ facets().totals.products }} products ·
+        {{ facets().totals.onSale }} on sale ·
+        {{ facets().totals.inStock }} ready to ship
+      </p>
+    }
+  </header>
+
+  <!-- Search + sort toolbar -->
+  <div class="shop-toolbar surface-card">
+    <div class="search-field">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input
+        type="search"
+        class="form-control"
+        placeholder="Search 150 products — try “RTX 5070”, “Samsung”, “DDR5”…"
+        aria-label="Search products"
+        [value]="searchText()"
+        (input)="onSearchInput($any($event.target).value)"
+      />
+      @if (loading()) {
+        <span class="search-spinner" aria-hidden="true"></span>
+      }
+    </div>
+
+    <div class="toolbar-right">
+      <button
+        type="button"
+        class="btn btn-ghost filters-toggle"
+        (click)="filtersOpen.set(!filtersOpen())"
+        [attr.aria-expanded]="filtersOpen()"
+      >
+        Filters
+        @if (activeFilterCount() > 0) {
+          <span class="filter-count">{{ activeFilterCount() }}</span>
+        }
+      </button>
+
+      <label class="sort-field">
+        <span class="visually-hidden">Sort by</span>
+        <select class="form-select" [value]="sort()" (change)="setSort($any($event.target).value)">
+          @for (option of sortOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <div class="shop-layout">
+    <!-- Filter sidebar -->
+    <aside class="shop-filters surface-card" [class.is-open]="filtersOpen()">
+      <div class="filter-block">
+        <h2 class="filter-title">Category</h2>
+
+        <!-- Eleven chips wrap into a tall block on a phone; a select is one tap. -->
+        <select
+          class="form-select cat-select"
+          [value]="categoryId() ?? ''"
+          (change)="selectCategoryFromList($any($event.target).value)"
+        >
+          <option value="">All categories</option>
+          @for (category of facets().categories; track category.id) {
+            <option [value]="category.id">{{ category.name }} ({{ category.count }})</option>
+          }
+        </select>
+
+        <div class="chip-row cat-chips">
+          <button type="button" class="chip" [class.is-active]="categoryId() === null" (click)="selectCategory(null)">
+            All
+          </button>
+          @for (category of facets().categories; track category.id) {
+            <button
+              type="button"
+              class="chip"
+              [class.is-active]="categoryId() === category.id"
+              (click)="selectCategory(category.id)"
+            >
+              {{ category.name }}<span class="chip-count">{{ category.count }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (facets().suppliers.length) {
+        <div class="filter-block">
+          <h2 class="filter-title">Shop / city</h2>
+
+          <div class="chip-row">
+            @for (c of facets().cities; track c.name) {
+              <button type="button" class="chip" [class.is-active]="city() === c.name" (click)="selectCity(c.name)">
+                {{ c.name }}<span class="chip-count">{{ c.count }}</span>
+              </button>
+            }
+          </div>
+
+          <ul class="supplier-list">
+            @for (s of facets().suppliers; track s.id) {
+              <li>
+                <label class="supplier-option">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [checked]="suppliers().includes(s.id)"
+                    (change)="toggleSupplier(s.id)"
+                  />
+                  <span class="supplier-copy">
+                    <span class="supplier-name">{{ s.name }}</span>
+                    <span class="supplier-where">{{ s.area }}, {{ s.city }}</span>
+                  </span>
+                  <span class="chip-count">{{ s.count }}</span>
+                </label>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="filter-block">
+        <h2 class="filter-title">Price ({{ facets().priceRange.min | calc }} – {{ facets().priceRange.max | calc }})</h2>
+        <div class="price-row">
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Min"
+            aria-label="Minimum price"
+            [value]="minPrice() ?? ''"
+            (change)="setPriceBound('min', $any($event.target).value)"
+          />
+          <span aria-hidden="true">–</span>
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Max"
+            aria-label="Maximum price"
+            [value]="maxPrice() ?? ''"
+            (change)="setPriceBound('max', $any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="filter-block">
+        <h2 class="filter-title">Availability</h2>
+        <button type="button" class="chip" [class.is-active]="inStockOnly()" (click)="toggleInStock()">
+          In stock only
+        </button>
+        <button type="button" class="chip" [class.is-active]="onSaleOnly()" (click)="toggleOnSale()">
+          On sale
+        </button>
+      </div>
+
+      @if (facets().brands.length) {
+        <div class="filter-block">
+          <h2 class="filter-title">Brand</h2>
+          <div class="brand-list">
+            @for (brand of facets().brands; track brand.name) {
+              <label class="brand-option">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="brands().includes(brand.name)"
+                  (change)="toggleBrand(brand.name)"
+                />
+                <span>{{ brand.name }}</span>
+                <span class="chip-count">{{ brand.count }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+
+      @if (hasFilters()) {
+        <button type="button" class="btn btn-ghost w-100" (click)="clearFilters()">Clear all filters</button>
+      }
+    </aside>
+
+    <!-- Results -->
+    <section class="shop-results">
+      <p class="results-count">{{ rangeLabel() }}</p>
+
+      @if (error()) {
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <h2 class="h5 mt-3">{{ error() }}</h2>
+          <button type="button" class="btn btn-brand mt-3" (click)="retry()">Try again</button>
+        </div>
+      } @else if (loading() && !items().length) {
+        <div class="product-grid">
+          @for (s of skeletons; track $index) {
+            <div class="pcard">
+              <div class="skeleton" style="aspect-ratio:4/3"></div>
+              <div class="pcard-body">
+                <div class="skeleton" style="height:10px;width:35%"></div>
+                <div class="skeleton" style="height:14px;width:90%"></div>
+                <div class="skeleton" style="height:14px;width:65%"></div>
+                <div class="skeleton" style="height:20px;width:45%;margin-top:.5rem"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (!items().length) {
+        <div class="empty-state">
+          <div class="empty-state-icon">🔎</div>
+          <h2 class="h5 mt-3">Nothing matches those filters</h2>
+          <p>Try widening the price range or clearing a filter.</p>
+          <button type="button" class="btn btn-brand mt-2" (click)="clearFilters()">Clear filters</button>
+        </div>
+      } @else {
+        <div class="product-grid" [class.is-refreshing]="loading()">
+          @for (product of items(); track product.id) {
+            <app-product-card [product]="product" [eager]="$index < 4" />
+          }
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pagination-row" aria-label="Product pages">
+            <button type="button" class="btn btn-ghost" [disabled]="page() === 1" (click)="goToPage(page() - 1)">
+              ← Prev
+            </button>
+            @for (n of pageWindow(); track n) {
+              <button type="button" class="chip" [class.is-active]="n === page()" (click)="goToPage(n)">{{ n }}</button>
+            }
+            <button
+              type="button"
+              class="btn btn-ghost"
+              [disabled]="page() === totalPages()"
+              (click)="goToPage(page() + 1)"
+            >
+              Next →
+            </button>
+          </nav>
+        }
+      }
+    </section>
+  </div>
+</div>

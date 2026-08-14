@@ -1,0 +1,254 @@
+<!-- Mail transport banner: the manager must know if alerts are not going out. -->
+@if (mailer(); as mail) {
+  @if (!mail.configured) {
+    <div class="mail-banner is-warning">
+      <strong>Order emails are not being sent.</strong>
+      SMTP is not configured, so alerts are only written to the server log. Add
+      <code>SMTP_USER</code> and <code>SMTP_PASS</code> to <code>.env</code> to start receiving them at
+      <strong>{{ mail.managerInbox || 'your inbox' }}</strong>.
+    </div>
+  } @else {
+    <div class="mail-banner is-ok">
+      Order alerts are being emailed to <strong>{{ mail.managerInbox }}</strong>.
+    </div>
+  }
+}
+
+<!-- KPIs -->
+<div class="order-kpis">
+  <div class="surface-card kpi" data-tone="warn">
+    <span class="kpi-value">{{ newCount() }}</span>
+    <span class="kpi-label">Awaiting your call</span>
+  </div>
+  <div class="surface-card kpi">
+    <span class="kpi-value">{{ totals().orders }}</span>
+    <span class="kpi-label">Live orders</span>
+  </div>
+  <div class="surface-card kpi">
+    <span class="kpi-value">{{ totals().units }}</span>
+    <span class="kpi-label">Units sold</span>
+  </div>
+  <div class="surface-card kpi" data-tone="ok">
+    <span class="kpi-value">{{ totals().open | calc }}</span>
+    <span class="kpi-label">Cash to collect</span>
+  </div>
+</div>
+
+<!-- Filters -->
+<section class="surface-card dash-panel">
+  <div class="table-head">
+    <h2 class="panel-title">Orders <span class="muted">({{ page()?.total ?? 0 }})</span></h2>
+    <input
+      type="search"
+      class="form-control table-search"
+      placeholder="Reference, name, phone or email…"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+    />
+  </div>
+
+  <div class="chip-row table-filters">
+    <button type="button" class="chip" [class.is-active]="statusFilter() === null" (click)="filterStatus(null)">
+      All
+    </button>
+    @for (status of statuses; track status.value) {
+      <button
+        type="button"
+        class="chip"
+        [class.is-active]="statusFilter() === status.value"
+        (click)="filterStatus(status.value)"
+      >
+        {{ status.label }}<span class="chip-count">{{ counts()[status.value] ?? 0 }}</span>
+      </button>
+    }
+  </div>
+
+  @if (loading() && !rows().length) {
+    @for (s of [1,2,3,4,5]; track s) {
+      <span class="skeleton d-block mb-2" style="height:56px"></span>
+    }
+  } @else if (!rows().length) {
+    <div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      <h3 class="h6 mt-3">No orders here yet</h3>
+      <p class="muted">Orders placed on the storefront show up in this list straight away.</p>
+    </div>
+  } @else {
+    <div class="order-list">
+      @for (order of rows(); track order.ref) {
+        <article class="order-row" [class.is-open]="openRef() === order.ref">
+          <button type="button" class="order-summary" (click)="toggleDetail(order.ref)" [attr.aria-expanded]="openRef() === order.ref">
+            <span class="order-ref">
+              {{ order.ref }}
+              <span class="order-when">{{ when(order.createdAt) }}</span>
+            </span>
+
+            <span class="order-who">
+              <span class="order-name">{{ order.customer.name }}</span>
+              <span class="order-phone">{{ order.customer.phone }}</span>
+            </span>
+
+            <span class="order-place">{{ order.address.governorate }}</span>
+            <span class="order-units">{{ order.itemCount }} unit(s)</span>
+            <span class="order-total">{{ order.total | calc }}</span>
+
+            <span class="status-badge" [attr.data-tone]="toneFor(order.status)">{{ labelFor(order.status) }}</span>
+            <span class="mail-dot" [attr.data-tone]="mailBadge(order).tone" [title]="mailBadge(order).label">✉</span>
+            <span class="order-caret" aria-hidden="true">{{ openRef() === order.ref ? '▲' : '▼' }}</span>
+          </button>
+
+          @if (openRef() === order.ref) {
+            <div class="order-detail">
+              <div class="detail-grid">
+                <!-- Items -->
+                <div class="detail-block">
+                  <h3 class="detail-title">Items</h3>
+                  <ul class="detail-items">
+                    @for (item of order.items; track item.productId) {
+                      <li>
+                        <img [src]="item.imgUrl" [alt]="" loading="lazy" decoding="async" width="40" height="40" />
+                        <span class="detail-item-copy">
+                          <a class="detail-item-name" [routerLink]="['/product', item.productId]">{{ item.name }}</a>
+                          <span class="muted">{{ item.quantity }} × {{ item.unitPrice | calc }}</span>
+                        </span>
+                        <span class="detail-item-total">{{ item.lineTotal | calc }}</span>
+                      </li>
+                    }
+                  </ul>
+                  <dl class="detail-totals">
+                    <div><dt>Subtotal</dt><dd>{{ order.subtotal | calc }}</dd></div>
+                    <div><dt>Delivery</dt><dd>{{ order.shipping === 0 ? 'Free' : (order.shipping | calc) }}</dd></div>
+                    <div><dt>COD fee</dt><dd>{{ order.codFee | calc }}</dd></div>
+                    <div class="is-total"><dt>Collect in cash</dt><dd>{{ order.total | calc }}</dd></div>
+                  </dl>
+                </div>
+
+                <!-- Customer + actions -->
+                <div class="detail-block">
+                  <h3 class="detail-title">Deliver to</h3>
+                  <address class="detail-address">
+                    <strong>{{ order.customer.name }}</strong><br />
+                    {{ order.address.street }}<br />
+                    {{ order.address.city }}, {{ order.address.governorate }}
+                    @if (order.address.notes) {
+                      <span class="detail-note">“{{ order.address.notes }}”</span>
+                    }
+                  </address>
+
+                  <div class="contact-buttons">
+                    <a class="btn btn-brand btn-sm" [href]="telHref(order)">📞 Call</a>
+                    <a class="btn btn-ghost btn-sm" [href]="whatsappHref(order)" target="_blank" rel="noopener">WhatsApp</a>
+                    @if (order.customer.email) {
+                      <a class="btn btn-ghost btn-sm" [href]="mailtoHref(order)">Email app</a>
+                    }
+                  </div>
+
+                  <h3 class="detail-title mt-3">Move this order on</h3>
+                  @if (nextStatuses(order).length) {
+                    <div class="status-actions">
+                      @for (next of nextStatuses(order); track next) {
+                        <button
+                          type="button"
+                          class="btn btn-sm"
+                          [class.btn-brand]="next !== 'cancelled'"
+                          [class.btn-ghost]="next === 'cancelled'"
+                          [class.btn-danger-ghost]="next === 'cancelled'"
+                          [disabled]="busyRef() === order.ref"
+                          (click)="advance(order, next)"
+                        >
+                          {{ next === 'cancelled' ? 'Cancel order' : 'Mark ' + labelFor(next).toLowerCase() }}
+                        </button>
+                      }
+                    </div>
+                    <label class="notify-toggle">
+                      <input type="checkbox" class="form-check-input" [checked]="notifyOnStatus()" (change)="notifyOnStatus.set($any($event.target).checked)" />
+                      <span>Email the customer about this change</span>
+                    </label>
+                  } @else {
+                    <p class="muted small mb-0">
+                      This order is {{ labelFor(order.status).toLowerCase() }} — no further steps.
+                    </p>
+                  }
+                </div>
+
+                <!-- Contact log -->
+                <div class="detail-block detail-wide">
+                  <h3 class="detail-title">Talk to the customer</h3>
+
+                  <div class="composer">
+                    <div class="composer-row">
+                      <select class="form-select form-select-sm" [value]="contactChannel()" (change)="contactChannel.set($any($event.target).value)">
+                        <option value="phone">Log a phone call</option>
+                        <option value="whatsapp">Log a WhatsApp message</option>
+                        <option value="email">Send an email</option>
+                        <option value="note">Internal note</option>
+                      </select>
+                      @if (contactChannel() === 'email') {
+                        <input
+                          class="form-control form-control-sm"
+                          placeholder="Subject"
+                          [value]="contactSubject()"
+                          (input)="contactSubject.set($any($event.target).value)"
+                        />
+                      }
+                    </div>
+                    <textarea
+                      class="form-control"
+                      rows="2"
+                      [placeholder]="contactChannel() === 'email' ? 'What do you want to say to the customer?' : 'What did you tell the customer?'"
+                      [value]="contactMessage()"
+                      (input)="contactMessage.set($any($event.target).value)"
+                    ></textarea>
+                    <button type="button" class="btn btn-brand btn-sm" [disabled]="busyRef() === order.ref" (click)="logContact(order)">
+                      {{ contactChannel() === 'email' ? 'Send email' : 'Save to log' }}
+                    </button>
+                  </div>
+
+                  @if (order.contactLog?.length) {
+                    <ul class="trail">
+                      @for (entry of order.contactLog; track entry.at) {
+                        <li>
+                          <span class="trail-chip" [attr.data-channel]="entry.channel">{{ entry.channel }}</span>
+                          <span class="trail-body">
+                            <span class="trail-message">{{ entry.message }}</span>
+                            <span class="trail-meta">
+                              {{ when(entry.at) }} · {{ entry.by }}
+                              @if (entry.delivered === false) {
+                                <span class="trail-fail">not delivered: {{ entry.error }}</span>
+                              }
+                            </span>
+                          </span>
+                        </li>
+                      }
+                    </ul>
+                  }
+
+                  <h3 class="detail-title mt-3">History</h3>
+                  <ul class="trail">
+                    @for (entry of order.statusHistory; track entry.at) {
+                      <li>
+                        <span class="trail-chip" [attr.data-tone]="toneFor(entry.status)">{{ labelFor(entry.status) }}</span>
+                        <span class="trail-body">
+                          @if (entry.note) { <span class="trail-message">{{ entry.note }}</span> }
+                          <span class="trail-meta">{{ when(entry.at) }} · {{ entry.by }}</span>
+                        </span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            </div>
+          }
+        </article>
+      }
+    </div>
+
+    @if (totalPages() > 1) {
+      <nav class="pagination-row" aria-label="Order pages">
+        <button type="button" class="btn btn-ghost btn-sm" [disabled]="pageNumber() === 1" (click)="goToPage(pageNumber() - 1)">← Prev</button>
+        <span class="muted">Page {{ pageNumber() }} of {{ totalPages() }}</span>
+        <button type="button" class="btn btn-ghost btn-sm" [disabled]="pageNumber() === totalPages()" (click)="goToPage(pageNumber() + 1)">Next →</button>
+      </nav>
+    }
+  }
+</section>
