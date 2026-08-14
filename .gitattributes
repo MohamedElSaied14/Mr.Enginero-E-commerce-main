@@ -1,2 +1,28 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Line endings
+#
+# Everything text is stored AND checked out as LF, on every platform. The
+# previous `* text=auto` stored LF but handed Windows CRLF on checkout, so the
+# working tree drifted from the repository and editors warned on every file.
+#
+# LF is the right target here: the API runs on Linux in production, and the
+# .mjs scripts are executed there too.
+* text=auto eol=lf
+
+# Binary assets — never convert these, it corrupts them.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.mp4   binary
+
+# Generated — keep them out of diffs and language stats.
+package-lock.json  -diff linguist-generated
+data/products.seed.json  -diff linguist-generated
