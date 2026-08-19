@@ -26,12 +26,12 @@ Java, or raw SQL anywhere.
 
 | Layer | Language | Files | Lines |
 | --- | --- | ---: | ---: |
-| **Frontend** | TypeScript | 48 | 4,280 |
-| | HTML *(Angular templates)* | 14 | 2,120 |
-| | CSS | 16 | 2,717 |
+| **Frontend** | TypeScript | 47 | 4,251 |
+| | HTML *(Angular templates)* | 13 | 2,097 |
+| | CSS | 15 | 2,717 |
 | **Backend** | JavaScript — ESM (`.mjs`) | 12 | 2,317 |
 | **Tooling** | JavaScript — ESM (`.mjs`) | 7 | 1,323 |
-| | | **97** | **12,757** |
+| | | **94** | **12,705** |
 
 ### Why TypeScript on the front and plain JavaScript on the back?
 
@@ -86,7 +86,7 @@ src/
     ├── app.config.ts           HttpClient, Router, interceptors, app initialiser
     ├── brand.ts                ★ Name, phone, WhatsApp, Facebook — one place
     │
-    ├── Components/             20 folders; each is a page or a reusable piece
+    ├── Components/             19 folders; each is a page or a reusable piece
     │   │
     │   │   ── Shell ──
     │   ├── header/             Nav, live search, cart & wishlist badges, theme toggle
@@ -121,10 +121,7 @@ src/
     │   │
     │   │   ── Content ──
     │   ├── about/              Story and stats
-    │   ├── contact/            Contact form and channels
-    │   │
-    │   └── forms/              ⚠ Dead code from the original template. No route
-    │                           and no component references it — safe to delete.
+    │   └── contact/            Contact form and channels
     │
     ├── services/               State and API access, injected where needed
     │   ├── product.service.ts    Catalogue: list, search, facets, CRUD, stock
