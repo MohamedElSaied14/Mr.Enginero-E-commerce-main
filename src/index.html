@@ -39,19 +39,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!--
-    Set the theme before the app boots so a dark-mode visitor never sees a
-    white flash while the bundle downloads.
+    Sets the theme before the app boots so a dark-mode visitor never sees a
+    white flash. Deliberately an external file, not inline, so the Content
+    Security Policy can forbid inline scripts entirely. Render-blocking on
+    purpose — it must run before the first paint.
   -->
-  <script>
-    (function () {
-      try {
-        var stored = localStorage.getItem('shopzone.theme');
-        var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        if (dark) document.body && document.body.classList.add('dark-theme');
-      } catch (e) {}
-    })();
-  </script>
+  <script src="theme-init.js"></script>
   <style>
     /* Paint the page background before styles.css arrives. */
     html { background: #f6f5f7; }

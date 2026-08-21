@@ -1,0 +1,34 @@
+# Keep the build context small and, above all, keep secrets out of the image.
+.env
+.env.local
+.env.*.local
+
+node_modules
+dist
+.angular
+.git
+.github
+.vscode
+
+# Documentation and captured screenshots are not needed to run the server.
+docs
+Screenshoots
+*.md
+!README.md
+
+# Build-time tooling. make-icons needs sharp, which is a devDependency and so is
+# absent from the runtime image — shipping the script would only offer a command
+# that cannot run. The scripts that are useful inside the container
+# (seed-db, build-catalog, sources) are kept.
+scripts/make-icons.mjs
+scripts/capture-screens.mjs
+scripts/build-report.mjs
+scripts/normalise-eol.mjs
+
+# Local artefacts
+*.log
+npm-debug.log*
+project1.zip
+coverage
+.DS_Store
+Thumbs.db

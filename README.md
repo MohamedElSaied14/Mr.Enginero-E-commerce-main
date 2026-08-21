@@ -370,6 +370,7 @@ targets under 40 px. See the [audit report](docs/AUDIT-REPORT.md).
 
 ## Further reading
 
+- **[Deployment guide](docs/DEPLOYMENT.md)** — taking it live, step by step, with a troubleshooting table
 - **[Project structure](docs/PROJECT-STRUCTURE.md)** — languages, every folder, and where to change what
 - **[Technical & UX audit report](docs/AUDIT-REPORT.md)** — findings, fixes, before/after evidence
 - **[Demo walkthroughs](docs/DEMO-WALKTHROUGHS.md)** — customer and admin journeys, step by step
